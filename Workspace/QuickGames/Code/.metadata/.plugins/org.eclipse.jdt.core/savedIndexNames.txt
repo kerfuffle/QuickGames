@@ -1,0 +1,7 @@
+INDEX VERSION 1.126+E:\Java\QuickGames\Code\.metadata\.plugins\org.eclipse.jdt.core
+537028496.index
+3577100964.index
+745233725.index
+551513651.index
+893988391.index
+986045601.index

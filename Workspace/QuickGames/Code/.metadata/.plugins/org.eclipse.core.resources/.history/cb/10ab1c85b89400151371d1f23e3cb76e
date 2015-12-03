@@ -1,0 +1,103 @@
+package net.kerfuffle.lanwar;
+
+import org.newdawn.slick.opengl.Texture;
+
+import net.kerfuffle.Utilities.Quad;
+import net.kerfuffle.Utilities.RGB;
+
+import static net.kerfuffle.Utilities.Util.*;
+
+public class Zombie implements Entity{
+	
+	float x, y, speed = (float) ((Math.random()*(4-1)) - 1);
+	private Quad box;
+	//private Quad head, body;
+	Texture leftTex, rightTex;
+	boolean dead = false;
+	
+	public Zombie(float x, float y)
+	{
+		this.x = x;
+		this.y = y;
+		
+		box = new Quad(x, y, 50, 75, new RGB(1, 1, 1));
+		leftTex = loadTex("zombieLeft");
+		rightTex = loadTex("zombieRight");
+		
+		//head = new Quad(x, y, 25, 25, new RGB(0, 0.5f, 1));
+		//body = new Quad(head.x + 25/2 - 5, head.y - 50, 10, 50, new RGB(0, 0.5f, 1));
+	}
+	
+	public void draw()
+	{
+		box.draw();
+		//head.draw();
+		//body.draw();
+	}
+
+	private void follow()
+	{
+		for (int i = 0; i < Main.players.size(); i++)
+		{
+			if (x > Main.players.get(i).x)
+			{
+				box.tex = leftTex;
+				setPos(x-speed, y);
+			}
+			if (x < Main.players.get(i).x)
+			{
+				box.tex = rightTex;
+				setPos(x+speed, y);
+			}
+			if (y > Main.players.get(i).y)
+			{
+				setPos(x, y-speed);
+			}
+			if (y < Main.players.get(i).y)
+			{
+				setPos(x, y+speed);
+			}
+		}
+	}
+	
+	public void checkHits()
+	{
+		for (int i = 0; i < Main.players.size(); i++)
+		{
+			for (int j = 0; j < Main.players.get(i).bullets.size(); j++)
+			{
+				/*if (hit(head, Main.players.get(i).bullets.get(j)) || hit(body, Main.players.get(i).bullets.get(j)))
+				{
+					Main.players.get(i).bullets.remove(j);
+				}*/
+				if (hit(box, Main.players.get(i).bullets.get(j)))
+				{
+					Main.players.get(i).bullets.remove(j);
+				}
+			}
+		}
+	}
+	
+	public void move()
+	{
+		follow();
+	}
+	
+	public void setPos(float x, float y)
+	{
+		this.x = x;
+		this.y = y;
+		this.box.x = x;
+		this.box.y = y;
+		/*head.x = x;
+		head.y = y;
+		body.x = head.x + 25/2 - 5;
+		body.y = head.y - 50;*/
+	}
+	
+	public String toString()
+	{
+		return new String(x + ", " + y);
+	}
+
+}

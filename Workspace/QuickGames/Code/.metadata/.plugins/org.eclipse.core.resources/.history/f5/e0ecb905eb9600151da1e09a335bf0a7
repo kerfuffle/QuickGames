@@ -1,0 +1,192 @@
+package net.kerfuffle.lanwar;
+
+import java.util.ArrayList;
+
+import org.newdawn.slick.opengl.Texture;
+
+import net.kerfuffle.Utilities.Quad;
+import net.kerfuffle.Utilities.RGB;
+
+import static net.kerfuffle.Utilities.Util.*;
+
+public class Zombie implements Entity{
+	
+	int id;
+	Map map;
+	ArrayList <Player> players = new ArrayList<Player>();
+	ArrayList <Zombie> zombies = new ArrayList<Zombie>();
+	
+	float x, y, speed = (float) ((Math.random()*(4-1)));
+	private Quad box;
+	Texture leftTex, rightTex;
+	boolean isDead = false;
+	
+	public Zombie(float x, float y, Map map)
+	{
+		this.x = x;
+		this.y = y;
+		this.map = map;
+		
+		players = extractPlayers(map.getEntities());
+		zombies = extractZombies(map.getEntities());
+		
+		box = new Quad(x, y, 50, 75, new RGB(1, 1, 1));
+		leftTex = loadTex("zombieLeft");
+		rightTex = loadTex("zombieRight");
+		
+		//head = new Quad(x, y, 25, 25, new RGB(0, 0.5f, 1));
+		//body = new Quad(head.x + 25/2 - 5, head.y - 50, 10, 50, new RGB(0, 0.5f, 1));
+	}
+	
+	public void draw()
+	{
+		box.draw();
+		//head.draw();
+		//body.draw();
+	}
+
+	public void ow(Player p)
+	{
+		if (hit(p.box, box))
+		{
+			isDead = true;
+		}
+	}
+	
+	private ArrayList<Player> extractPlayers(ArrayList<Entity>entities)
+	{
+		 ArrayList <Player> ret = new ArrayList<Player>();
+		 
+		 for (Entity e : entities)
+		 {
+			 if (e.getClass() == Player.class)
+			 {
+				 ret.add((Player)e);
+			 }
+		 }
+		 
+		 return ret;
+	}
+	private ArrayList <Zombie> extractZombies(ArrayList<Entity>entities)
+	{
+		ArrayList <Zombie> ret = new ArrayList<Zombie>();
+		
+		for (Entity e : entities)
+		{
+			if (e.getClass() == Zombie.class)
+			{
+				ret.add((Zombie)e);
+			}
+		}
+		return ret;
+	}
+	
+	private void follow()
+	{
+		for (int i = 0; i < players.size(); i++)
+		{
+			if (x > players.get(i).x)
+			{
+				box.tex = leftTex;
+				setPos(x-speed, y);
+			}
+			if (x < players.get(i).x)
+			{
+				box.tex = rightTex;
+				setPos(x+speed, y);
+			}
+			if (y > players.get(i).y)
+			{
+				setPos(x, y-speed);
+			}
+			if (y < players.get(i).y)
+			{
+				setPos(x, y+speed);
+			}
+		}
+		for (Zombie z : zombies)
+		{
+			if (z == this)
+			{
+				continue;
+			}
+			
+			if (hitRight(this.box, z.box))
+			{
+				System.out.println("hit");
+				this.setPos(x+speed, y); 
+			}
+			if (hitLeft(this.box, z.box))
+			{
+				this.setPos(x-speed, y);
+			}
+			if (hitUp(this.box, z.box))
+			{
+				this.setPos(x, y+speed);
+			}
+			if (hitDown(this.box, z.box))
+			{
+				this.setPos(x, y-speed);
+			}
+		}
+	}
+	
+	private void checkHits()
+	{
+		for (int i = 0; i < players.size(); i++)
+		{
+			for (int j = 0; j < players.get(i).bullets.size(); j++)
+			{
+				/*if (hit(head, Main.players.get(i).bullets.get(j)) || hit(body, Main.players.get(i).bullets.get(j)))
+				{
+					Main.players.get(i).bullets.remove(j);
+				}*/
+				if (hit(box, players.get(i).bullets.get(j)))
+				{
+					players.get(i).bullets.remove(j);
+				}
+			}
+		}
+	}
+	
+	public void move()
+	{
+		players = extractPlayers(map.getEntities());
+		follow();
+		checkHits();
+	}
+	
+	public void setPos(float x, float y)
+	{
+		this.x = x;
+		this.y = y;
+		this.box.x = x;
+		this.box.y = y;
+		/*head.x = x;
+		head.y = y;
+		body.x = head.x + 25/2 - 5;
+		body.y = head.y - 50;*/
+	}
+	
+	public String toString()
+	{
+		return new String(x + ", " + y);
+	}
+
+	
+	public int getId() 
+	{
+		return id;
+	}
+
+	public void setId(int id) 
+	{
+		this.id = id;
+	}
+	
+	public boolean isDead() 
+	{
+		return isDead;
+	}
+
+}

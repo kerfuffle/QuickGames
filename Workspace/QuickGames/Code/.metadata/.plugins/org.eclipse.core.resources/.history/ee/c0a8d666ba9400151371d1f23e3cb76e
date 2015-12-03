@@ -1,0 +1,15 @@
+package net.kerfuffle.lanwar;
+
+public interface Entity {
+
+	int id = -1;
+	
+	public boolean isDead = false;
+	
+	public abstract void draw();
+	
+	public abstract void move();
+	
+	public abstract String toString();
+	
+}
